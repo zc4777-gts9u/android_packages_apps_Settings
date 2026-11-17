@@ -17,7 +17,7 @@
 package com.android.settings.deviceinfo.firmwareversion
 
 import android.content.Context
-import android.os.Build
+import com.android.settings.deviceinfo.BuildNumberUtils
 import android.text.BidiFormatter
 import android.view.View.LAYOUT_DIRECTION_RTL
 import androidx.preference.Preference
@@ -56,7 +56,7 @@ class SimpleBuildNumberPreference :
 
     override fun getSummary(context: Context): CharSequence? {
         val isRtl = context.resources.configuration.layoutDirection == LAYOUT_DIRECTION_RTL
-        return BidiFormatter.getInstance(isRtl).unicodeWrap(Build.DISPLAY)
+        return BidiFormatter.getInstance(isRtl).unicodeWrap(BuildNumberUtils.getBuildNumber())
     }
 
     override fun bind(preference: Preference, metadata: PreferenceMetadata) {

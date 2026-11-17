@@ -3118,18 +3118,18 @@
 
         <activity android:name=".biometrics.face.FaceEnrollParentalConsent"
                   android:exported="false"
-                  android:screenOrientation="portrait"/>
+                  android:screenOrientation="@integer/config_face_enroll_capture_orientation"/>
 
         <activity android:name=".biometrics.face.FaceEnrollIntroduction"
                   android:exported="false"
                   android:theme="@style/GlifV4Theme.DayNight"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="@integer/config_face_enroll_intro_orientation">
         </activity>
 
         <activity android:name=".biometrics.face.FaceEnroll"
                   android:exported="true"
                   android:theme="@style/GlifV4Theme.DayNight"
-                  android:screenOrientation="nosensor">
+                  android:screenOrientation="@integer/config_face_enroll_intro_orientation">
             <intent-filter>
                 <action android:name="android.settings.FACE_ENROLL"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -3138,30 +3138,30 @@
 
         <activity android:name=".biometrics.face.FaceEnrollIntroductionInternal"
                   android:exported="false"
-                  android:screenOrientation="nosensor"
+                  android:screenOrientation="@integer/config_face_enroll_intro_orientation"
                   android:theme="@style/GlifV4Theme.DayNight"
                   android:taskAffinity="com.android.settings.root" />
 
         <activity android:name=".biometrics.face.FaceEnrollEducation"
             android:exported="false"
             android:theme="@style/GlifV4Theme.DayNight"
-            android:screenOrientation="nosensor"/>
+            android:screenOrientation="@integer/config_face_enroll_intro_orientation"/>
 
         <activity android:name=".biometrics.face.FaceEnrollEnrolling"
             android:exported="false"
             android:theme="@style/GlifV4Theme.DayNight"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="@integer/config_face_enroll_capture_orientation"/>
 
         <activity android:name=".biometrics.face.FaceEnrollFinish"
             android:exported="false"
             android:theme="@style/GlifV4Theme.DayNight"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="@integer/config_face_enroll_capture_orientation"/>
 
         <activity android:name=".biometrics.face.FaceEnrollFoldPage"
             android:exported="false"
             android:theme="@style/GlifV4Theme.DayNight"
             android:configChanges="density|keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize"
-            android:screenOrientation="nosensor"/>
+            android:screenOrientation="@integer/config_face_enroll_intro_orientation"/>
 
         <activity android:name=".biometrics.BiometricHandoffActivity"
                   android:exported="false"/>

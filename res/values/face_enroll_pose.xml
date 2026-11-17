@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="config_face_enroll_samsung_pose_guidance">false</bool>
+    <!-- Instruction during the centered phase of Samsung face enrollment. -->
+    <string name="face_enroll_pose_look_ahead">Look straight ahead and keep your face in the circle</string>
+    <!-- Instruction when the HAL requests the upward pose. -->
+    <string name="face_enroll_pose_look_up">Slowly raise your chin and look slightly upward</string>
+    <!-- Samsung pauses enrollment for a second pass without glasses. -->
+    <string name="face_enroll_remove_glasses_title">Remove your glasses</string>
+    <string name="face_enroll_remove_glasses_message">Remove your glasses, then tap Continue to finish registering your face. If you are not wearing glasses, tap Continue.</string>
+    <string name="face_enroll_glasses_continue">Continue</string>
+</resources>

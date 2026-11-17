@@ -20,9 +20,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
-/**
- * Square layout that sets the height to be the same as width.
- */
+/** Square preview layout that fits within the available width and height. */
 public class FaceSquareFrameLayout extends FrameLayout {
 
     public FaceSquareFrameLayout(Context context) {
@@ -44,10 +42,10 @@ public class FaceSquareFrameLayout extends FrameLayout {
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        // Don't call super, manually set their size below
-        int size = MeasureSpec.getSize(widthMeasureSpec);
-
-        // Set this frame layout to be a square
+        final int width = MeasureSpec.getSize(widthMeasureSpec);
+        final int height = MeasureSpec.getSize(heightMeasureSpec);
+        final int size = MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.UNSPECIFIED
+                ? width : Math.min(width, height);
         setMeasuredDimension(size, size);
 
         // Set the children to be the same size (square) as well

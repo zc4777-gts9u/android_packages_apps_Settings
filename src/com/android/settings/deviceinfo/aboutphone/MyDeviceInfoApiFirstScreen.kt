@@ -98,7 +98,7 @@ class MyDeviceInfoApiFirstScreen :
         ) {
             sensitivityLevel(SensitivityLevel.DO_NOT_EXPOSE)
 
-            get { execute { Build.DISPLAY } }
+            get { execute { BuildNumberUtils.getBuildNumber() } }
         }
 
         preference(

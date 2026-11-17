@@ -57,6 +57,9 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
     private Interpolator mLinearOutSlowInInterpolator;
     private FaceEnrollPreviewFragment mPreviewFragment;
     private boolean mCompletionStarted;
+    private boolean mSamsungPoseGuidance;
+    private boolean mGlassesEnrollmentPaused;
+    private CharSequence mPosePrompt;
     private boolean mPromptVisible;
     private final Handler mPromptHandler = new Handler();
 
@@ -102,7 +105,16 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
                     .show(getSupportFragmentManager(), BiometricsSplitScreenDialog.class.getName());
         }
         setContentView(R.layout.face_enroll_enrolling);
-        setHeaderText(R.string.security_settings_face_enroll_repeat_title);
+        mSamsungPoseGuidance = getResources().getBoolean(
+                R.bool.config_face_enroll_samsung_pose_guidance);
+        if (mSamsungPoseGuidance) {
+            mPosePrompt = getText(R.string.face_enroll_pose_look_ahead);
+            getLayout().getHeaderTextView().setAccessibilityLiveRegion(
+                    View.ACCESSIBILITY_LIVE_REGION_POLITE);
+            setHeaderText(mPosePrompt);
+        } else {
+            setHeaderText(R.string.security_settings_face_enroll_repeat_title);
+        }
         mErrorText = findViewById(R.id.error_text);
         mLinearOutSlowInInterpolator = AnimationUtils.loadInterpolator(
                 this, android.R.interpolator.linear_out_slow_in);
@@ -117,6 +129,16 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
                         .build()
         );
 
+        if (mSamsungPoseGuidance) {
+            mFooterBarMixin.setPrimaryButton(new FooterButton.Builder(this)
+                    .setText(R.string.face_enroll_glasses_continue)
+                    .setListener(view -> resumeAfterGlassesRemoval())
+                    .setButtonType(FooterButton.ButtonType.NEXT)
+                    .setTheme(com.google.android.setupdesign.R.style.SudGlifButton_Primary)
+                    .build());
+            mFooterBarMixin.getPrimaryButton().setVisibility(View.GONE);
+        }
+
         if (!getIntent().getBooleanExtra(BiometricEnrollBase.EXTRA_KEY_REQUIRE_DIVERSITY, true)) {
             mDisabledFeatures.add(FEATURE_REQUIRE_REQUIRE_DIVERSITY);
         }
@@ -125,6 +147,16 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
         }
 
         startEnrollment();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (mSamsungPoseGuidance && mSidecar instanceof FaceEnrollSidecar
+                && ((FaceEnrollSidecar) mSidecar).isWaitingForGlassesRemoval()) {
+            // A retained sidecar can be paused without further frames to replay its prompt.
+            onEnrollmentHelp(SamsungFaceEnrollGuidance.GLASSES_HELP_CODE, null);
+        }
     }
 
     @Override
@@ -169,6 +201,7 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
             getSupportFragmentManager().beginTransaction().add(mPreviewFragment, TAG_FACE_PREVIEW)
                     .commitAllowingStateLoss();
         }
+        mPreviewFragment.bindViews(this);
         mPreviewFragment.setListener(mListener);
         if (getResources().getBoolean(R.bool.config_face_enroll_hal_owns_camera)) {
             // The face HAL renders into the preview surface, wait until it is available.
@@ -206,6 +239,29 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
 
     @Override
     public void onEnrollmentHelp(int helpMsgId, CharSequence helpString) {
+        if (mCompletionStarted) return;
+        if (mSamsungPoseGuidance && SamsungFaceEnrollGuidance.isGlassesHelpCode(helpMsgId)) {
+            if (mGlassesEnrollmentPaused) return;
+            mGlassesEnrollmentPaused = true;
+            mPosePrompt = getText(R.string.face_enroll_remove_glasses_title);
+            setHeaderText(mPosePrompt);
+            mPromptHandler.removeCallbacksAndMessages(null);
+            mErrorText.animate().cancel();
+            mPromptVisible = true;
+            showPrompt(getText(R.string.face_enroll_remove_glasses_message));
+            mFooterBarMixin.getPrimaryButton().setVisibility(View.VISIBLE);
+            return;
+        }
+        if (mGlassesEnrollmentPaused) return;
+        if (mSamsungPoseGuidance && SamsungFaceEnrollGuidance.isPoseHelpCode(helpMsgId)
+                && !TextUtils.isEmpty(helpString)) {
+            // Pose instructions stay visible and change immediately with the HAL stage.
+            if (!TextUtils.equals(mPosePrompt, helpString)) {
+                mPosePrompt = helpString;
+                setHeaderText(helpString);
+            }
+            return;
+        }
         if (!TextUtils.isEmpty(helpString)) {
             showError(helpString);
         }
@@ -243,6 +299,19 @@ public class FaceEnrollEnrolling extends BiometricsEnrollEnrolling {
                     CustomSliceRegistry.FACE_ENROLL_SLICE_URI, null);
             launchFinish(mToken);
         }
+    }
+
+    private void resumeAfterGlassesRemoval() {
+        if (!mGlassesEnrollmentPaused || !(mSidecar instanceof FaceEnrollSidecar)) return;
+        mGlassesEnrollmentPaused = false;
+        mFooterBarMixin.getPrimaryButton().setVisibility(View.GONE);
+        mPromptHandler.removeCallbacksAndMessages(null);
+        mErrorText.animate().cancel();
+        mErrorText.setVisibility(View.INVISIBLE);
+        mPromptVisible = false;
+        mPosePrompt = getText(R.string.face_enroll_pose_look_ahead);
+        setHeaderText(mPosePrompt);
+        ((FaceEnrollSidecar) mSidecar).resumeEnrollment();
     }
 
     private void showErrorDialog(CharSequence msg, int msgId) {

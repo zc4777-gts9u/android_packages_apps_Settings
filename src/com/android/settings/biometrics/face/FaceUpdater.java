@@ -52,6 +52,11 @@ public class FaceUpdater {
         mFaceManager = faceManager;
     }
 
+    /** Resume an active enrollment paused for user guidance. */
+    public boolean resumeEnrollment() {
+        return mFaceManager != null && mFaceManager.resumeEnrollment();
+    }
+
     /** Wrapper around the {@link FaceManager#enroll} method. */
     public void enroll(
             int userId,

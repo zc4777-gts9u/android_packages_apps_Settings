@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_enroll_pose_look_ahead">请正视前方，让面孔保持在圆圈内</string>
+    <string name="face_enroll_pose_look_up">请缓缓抬头，稍微看向上方</string>
+    <string name="face_enroll_remove_glasses_title">请摘下眼镜</string>
+    <string name="face_enroll_remove_glasses_message">摘下眼镜后，点按“继续”完成剩余录入。若未戴眼镜，请直接点按“继续”。</string>
+    <string name="face_enroll_glasses_continue">继续</string>
+</resources>

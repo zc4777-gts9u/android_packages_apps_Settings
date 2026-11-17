@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="face_enroll_pose_look_ahead">請直視前方，讓臉部保持在圓圈內</string>
+    <string name="face_enroll_pose_look_up">請緩緩抬頭，稍微看向上方</string>
+    <string name="face_enroll_remove_glasses_title">請摘下眼鏡</string>
+    <string name="face_enroll_remove_glasses_message">摘下眼鏡後，輕觸「繼續」完成剩餘註冊。若未戴眼鏡，請直接輕觸「繼續」。</string>
+    <string name="face_enroll_glasses_continue">繼續</string>
+</resources>
