@@ -38,8 +38,18 @@
     <!-- Whether to show min refresh rate in display settings -->
     <bool name="config_show_min_refresh_rate_switch">false</bool>
 
-    <!-- Whether Settings should open a separate camera preview during face enrollment -->
+    <!-- Whether the face HAL owns the enrollment camera and renders the preview. -->
     <bool name="config_face_enroll_hal_owns_camera">false</bool>
+
+    <!-- Use a TextureView for a HAL-rendered 4:3 preview. -->
+    <bool name="config_face_enroll_hal_preview_uses_texture_view">false</bool>
+
+    <!-- ActivityInfo.SCREEN_ORIENTATION_NOSENSOR and SCREEN_ORIENTATION_PORTRAIT. -->
+    <integer name="config_face_enroll_intro_orientation">5</integer>
+    <integer name="config_face_enroll_capture_orientation">1</integer>
+
+    <!-- Rotate the face preview with the display. -->
+    <bool name="config_face_enroll_follow_user_rotation">false</bool>
 
     <!-- HAL-owned face preview size, must match a supported camera size -->
     <integer name="face_preview_width">1080</integer>

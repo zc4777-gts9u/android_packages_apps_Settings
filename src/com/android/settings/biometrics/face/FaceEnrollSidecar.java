@@ -19,9 +19,12 @@ package com.android.settings.biometrics.face;
 import android.app.Activity;
 import android.app.settings.SettingsEnums;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.hardware.face.FaceEnrollCell;
 import android.hardware.face.FaceManager;
 import android.view.Surface;
 
+import com.android.settings.R;
 import com.android.settings.biometrics.BiometricEnrollSidecar;
 
 import java.util.Arrays;
@@ -34,6 +37,9 @@ public class FaceEnrollSidecar extends BiometricEnrollSidecar {
     private final int[] mDisabledFeatures;
 
     private FaceUpdater mFaceUpdater;
+    private Resources mResources;
+    private boolean mWaitingForGlassesRemoval;
+    private boolean mGlassesStageHandled;
 
     private Intent mIntent;
 
@@ -48,7 +54,8 @@ public class FaceEnrollSidecar extends BiometricEnrollSidecar {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        mFaceUpdater = new FaceUpdater(activity);
+        mFaceUpdater = new FaceUpdater(activity.getApplicationContext());
+        mResources = activity.getResources();
     }
 
     @Override
@@ -57,6 +64,23 @@ public class FaceEnrollSidecar extends BiometricEnrollSidecar {
         mFaceUpdater.enroll(mUserId, mToken, mEnrollmentCancel,
                 mEnrollmentCallback, mDisabledFeatures, mPreviewSurface,
                 false /* debugConsent */, mIntent);
+    }
+
+    boolean isWaitingForGlassesRemoval() {
+        return mWaitingForGlassesRemoval;
+    }
+
+    public void resumeEnrollment() {
+        if (!mWaitingForGlassesRemoval) return;
+        if (mFaceUpdater.resumeEnrollment()) {
+            mWaitingForGlassesRemoval = false;
+            mGlassesStageHandled = true;
+        } else {
+            super.onEnrollmentError(
+                    android.hardware.biometrics.BiometricFaceConstants.FACE_ERROR_HW_UNAVAILABLE,
+                    mResources.getText(
+                            R.string.security_settings_face_enroll_error_generic_dialog_message));
+        }
     }
 
     private FaceManager.EnrollmentCallback mEnrollmentCallback
@@ -68,7 +92,24 @@ public class FaceEnrollSidecar extends BiometricEnrollSidecar {
         }
 
         @Override
+        public void onEnrollmentFrame(int helpCode, CharSequence helpMessage,
+                FaceEnrollCell cell, int stage, float pan, float tilt, float distance) {
+            if (mResources.getBoolean(R.bool.config_face_enroll_samsung_pose_guidance)) {
+                final int message = SamsungFaceEnrollGuidance.getMessageResId(helpCode, stage);
+                if (message != 0) {
+                    helpMessage = mResources.getText(message);
+                }
+            }
+            onEnrollmentHelp(helpCode, helpMessage);
+        }
+
+        @Override
         public void onEnrollmentHelp(int helpMsgId, CharSequence helpString) {
+            if (mResources.getBoolean(R.bool.config_face_enroll_samsung_pose_guidance)
+                    && SamsungFaceEnrollGuidance.isGlassesHelpCode(helpMsgId)) {
+                if (mGlassesStageHandled) return;
+                mWaitingForGlassesRemoval = true;
+            }
             FaceEnrollSidecar.super.onEnrollmentHelp(helpMsgId, helpString);
         }
 

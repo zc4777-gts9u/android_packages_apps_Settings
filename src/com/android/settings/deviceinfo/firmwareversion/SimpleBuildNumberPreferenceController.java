@@ -17,10 +17,10 @@
 package com.android.settings.deviceinfo.firmwareversion;
 
 import android.content.Context;
-import android.os.Build;
 import android.text.BidiFormatter;
 
 import com.android.settings.core.BasePreferenceController;
+import com.android.settings.deviceinfo.BuildNumberUtils;
 
 // LINT.IfChange
 public class SimpleBuildNumberPreferenceController extends BasePreferenceController {
@@ -37,7 +37,7 @@ public class SimpleBuildNumberPreferenceController extends BasePreferenceControl
 
     @Override
     public CharSequence getSummary() {
-        return BidiFormatter.getInstance().unicodeWrap(Build.DISPLAY);
+        return BidiFormatter.getInstance().unicodeWrap(BuildNumberUtils.getBuildNumber());
     }
 }
 // LINT.ThenChange(SimpleBuildNumberPreference.kt)
