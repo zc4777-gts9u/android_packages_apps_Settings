@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings.Global.DEVICE_NAME
 import com.android.settings.R
+import com.android.settings.deviceinfo.BuildNumberUtils
 import com.android.settings.flags.Flags
 import com.android.settings.wifi.tether.WifiDeviceNameTextValidator
 import com.android.settingslib.datastore.Permissions
